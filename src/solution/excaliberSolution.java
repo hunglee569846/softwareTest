@@ -1,13 +1,11 @@
 package solution;
-import java.awt.Window.Type;
+import java.awt.Window;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class excaliberSolution {
@@ -17,7 +15,8 @@ public class excaliberSolution {
 	private static final int[] rowDirect = {-1, 1, 0, 0};
 	private static final int[] colDirect = {0, 0, 1, -1};
 	
-	private static final String[] doneExcaliber = {"A","B","C"};
+	private static final String[] doneExcaliber = {"A","B","C", "S"};
+	
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
@@ -35,6 +34,9 @@ public class excaliberSolution {
 			
 			result = 0;
 		    List<String> checkExcaliber=new ArrayList<String>();
+		    ArrayList<Object[]> coordinates = new ArrayList<>() {};
+		    
+		    ArrayList<Object[]> result = new ArrayList<>() {};
 		    
 			line = new StringTokenizer(br.readLine());
 			
@@ -53,12 +55,35 @@ public class excaliberSolution {
 				line = new StringTokenizer(br.readLine());
 				for(int m = 0; m < col; m++) {
 					map[n][m] = line.nextToken();
+					if((Arrays.asList(doneExcaliber).contains(map[n][m]))) {
+						coordinates.add(new Object[] {n, m, map[n][m]});
+					}
 					
 				}
 			}
-			while(checkExcaliber.size() != 4) {
-				BFS(map,checkExcaliber);
+			
+
+			List<String> prt = new ArrayList<>();
+			
+			for(String i : doneExcaliber) {
+				for(String n : doneExcaliber) {
+					if(i!=n && !prt.contains((i+n)) && !prt.contains((n+i))) {
+						prt.add((i+n));
+						System.out.println("result: "+ i + n);
+					}
+					
+				}
 			}
+			
+			for(Object[] condi : coordinates) {
+				System.out.println("list value: " + Arrays.toString(condi));
+				BFS(map, condi, "C");
+			}
+			
+			
+//			while(checkExcaliber.size() != 4) {
+//				BFS(map,checkExcaliber);
+//			}
 			
 			
 			bw.write("#"+tc+" :" +result+"\n");
@@ -70,27 +95,35 @@ public class excaliberSolution {
 
 	}
 	
-	public static void BFS(String[][] map, List<String> checkExcaliber) {
+	public static void BFS(String[][] map, Object[] startPoint,String endPoint) {
 		boolean visited[][] = new boolean[row][col];
-		Deque<int[]> dequeue = new LinkedList();
+		Deque<Object[]> dequeue = new LinkedList<>();
 		
-		dequeue.add(new int[] {gr,gc,0});
+		dequeue.add(startPoint);
 		visited[gr][gc] = true;
+		
+		int st = 0;
+		
+//		Object[] current = dequeue.poll();
+		
+//		System.out.println("Dequeue: " +  Arrays.toString(current));
 		
 		
 		while (!dequeue.isEmpty()) {
-			int[] current = dequeue.poll();
+			Object[] current = dequeue.poll();
 			
-			int currentRow = current[0];
-			int currentCol = current[1];
-			int st = current[2];
+			int currentRow = (int) current[0];
+			int currentCol = (int) current[1];
+			String str = (String) current[2];
+			
+			System.out.print("Value: " +str+"\n");
 
 			// check A,B,C of excaliber   && !checkExcaliber.equals(map[currentRow][currentCol])
-			if((Arrays.asList(doneExcaliber).contains(map[currentRow][currentCol]))  && !checkExcaliber.contains(map[currentRow][currentCol])) {
+			if((Arrays.asList(doneExcaliber).contains(map[currentRow][currentCol]))) {
 				System.out.printf("nextPoint: "+ map[currentRow][currentCol]+"\n");
 				System.out.print("Strat x: " +currentRow+ "y: "+currentCol+"\n");
 				
-				checkExcaliber.add(map[currentRow][currentCol]);
+//				checkExcaliber.add(map[currentRow][currentCol]);
 				
 				result += st;
 				System.out.printf("resutl=1====>  : "+result+"\n");
@@ -100,27 +133,6 @@ public class excaliberSolution {
 				System.out.printf("dequeue : "+dequeue.size()+"\n");
 				gr = currentRow;
 				gc = currentCol;
-				
-			}
-			
-// Check done excaliber
-			if(checkExcaliber.size() == 3 ) {
-				if(map[currentRow][currentCol].equals("S")) {
-					checkExcaliber.add(map[currentRow][currentCol]);
-					result += st;
-					dequeue.clear();
-					break;
-				}
-				st++;
-				for(int i = 0; i < 4; i++) {
-					int newRow = currentRow + rowDirect[i];
-					int newCol = currentCol + colDirect[i];
-					
-					if(isValid(newRow, newCol) && !visited[newRow][newCol]) {
-						dequeue.add(new int[] {newRow, newCol, st});
-						visited[newRow][newCol] = false;
-					}
-				}
 			}
 			
 			st++;
@@ -141,5 +153,6 @@ public class excaliberSolution {
 	private static boolean isValid(int newRow, int newCol) {
 		return newRow >= 0 && newRow < row && newCol >=0 && newCol < col; 
 	}
+	
 
 }
